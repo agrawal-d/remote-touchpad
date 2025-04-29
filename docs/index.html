@@ -11,19 +11,24 @@
 <body>
     <div class="uninit" id="uninit">
         <form action="javascript:void(0);" id="init">
-            <h1>🐭 Remote Toucpad</h1>
-            <h4>💻 Connect with your Windows device</h4>
-            <p>Make sure your phone and PC are on the same network (eg. connected to the same Wi-Fi)</p>
+            <h1>🐭 Remote Touchpad</h1>
+            <h2>💻 Connect with your Windows device</h2>
+            <b>Run touchpad.exe after downloading it from <a href="https://github.com/agrawal-d/remote-touchpad"
+                    target="_blank">here</a> and fill the information below.</b>
+
+            <br />
+            <br />
             <input type="text" id="ip" placeholder="PC's IP address" pattern="\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"
                 required />
             <input type="number" id="port" placeholder="Port" required />
             <input type="submit" value="Connect" id="connect" />
             <span id="status" class="hidden">...</span>
-            <h4>ℹ️ How to use?</h4>
+            <h2>🌐 How to use?</h2>
             <ul>
                 <li>After connecting, use your phone horizontally.</li>
                 <li>Drage your finger to move the cursor.</li>
                 <li>Tap to left-click, and Long-Press to right-click.</li>
+                <li>Make sure your phone and PC are on the same network (eg. connected to the same Wi-Fi).</li>
             </ul>
         </form>
     </div>
