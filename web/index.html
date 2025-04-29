@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remote touchpad - Use your phone as a track-pad for your Windows device</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+    <div class="uninit" id="uninit">
+        <form action="javascript:void(0);" id="init">
+            <h1>🐭 Remote Toucpad</h1>
+            <h4>💻 Connect with your Windows device</h4>
+            <p>Make sure your phone and PC are on the same network (eg. connected to the same Wi-Fi)</p>
+            <input type="text" id="ip" placeholder="PC's IP address" pattern="\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"
+                required />
+            <input type="number" id="port" placeholder="Port" required />
+            <input type="submit" value="Connect" id="connect" />
+            <span id="status" class="hidden">...</span>
+            <h4>ℹ️ How to use?</h4>
+            <ul>
+                <li>After connecting, use your phone horizontally.</li>
+                <li>Drage your finger to move the cursor.</li>
+                <li>Tap to left-click, and Long-Press to right-click.</li>
+            </ul>
+        </form>
+    </div>
+    <div id="touchpad"></div>
+    <script src="main.js"></script>
+</body>
+
+</html>
