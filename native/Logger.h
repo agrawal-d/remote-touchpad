@@ -1,2 +1,2 @@
 #pragma once
-constexpr bool LOG_VERBOSE = true;
+constexpr bool LOG_VERBOSE = false;

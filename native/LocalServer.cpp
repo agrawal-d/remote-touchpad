@@ -130,11 +130,6 @@ void LocalServer::handleClient(SOCKET clientSock)
         }
     }
 
-    // data contains substring "GET /?data=<some content> HTTP/1.1"
-    // extract the <some content> into a string
-    const string DATA_KEY = "data=";
-    const string HTTP_KEY = " HTTP";
-
     size_t dataPos = input.find(DATA_KEY);
     size_t endPos = input.find(HTTP_KEY, dataPos);
 
@@ -149,8 +144,7 @@ void LocalServer::handleClient(SOCKET clientSock)
     }
 
     // Send a success empty HTTP response
-    const char *response = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
-    send(clientSock, response, strlen(response), 0);
+    send(clientSock, HTTP_RESPONSE.data(), HTTP_RESPONSE.size(), 0);
     closesocket(clientSock);
 }
 
@@ -168,7 +162,6 @@ void LocalServer::acceptConnections()
             }
             continue;
         }
-        cout << "Client connected" << endl;
         handleClient(clientSock);
     }
 }
