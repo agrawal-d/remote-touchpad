@@ -1,11 +1,6 @@
 #include "LocalServer.h"
-#include <iostream>
-#include <winsock2.h>
-#include <windows.h>
 
-using namespace std;
-
-LocalServer::LocalServer(uint16_t port, std::function<void(vector<char>)> callback)
+LocalServer::LocalServer(uint16_t port, function<void(string)> callback)
     : port(port), callback(callback), sock(INVALID_SOCKET)
 {
 }
@@ -103,31 +98,68 @@ bool LocalServer::startListening()
 
 void LocalServer::handleClient(SOCKET clientSock)
 {
-    char buffer[1024];
-    int bytesReceived = recv(clientSock, buffer, sizeof(buffer), 0);
-    if (bytesReceived == SOCKET_ERROR)
+    char buffer[4096]; // 4KiB buffer
+    string data;
+
+    while (true)
     {
-        cout << "Receive failed" << endl;
-        cout << "Error: " << WSAGetLastError() << endl;
+        int bytesReceived = recv(clientSock, buffer, sizeof(buffer), 0);
+        if (bytesReceived == SOCKET_ERROR)
+        {
+            cout << "Receive failed" << endl;
+            cout << "Error: " << WSAGetLastError() << endl;
+            break;
+        }
+        else if (bytesReceived == 0)
+        {
+            cout << "Client disconnected" << endl;
+            break;
+        }
+        else
+        {
+            data.insert(data.end(), buffer, buffer + bytesReceived);
+            if (bytesReceived >= 4 && buffer[bytesReceived - 4] == '\r' && buffer[bytesReceived - 3] == '\n' &&
+                buffer[bytesReceived - 2] == '\r' && buffer[bytesReceived - 1] == '\n')
+            {
+                break;
+            }
+        }
+    }
+
+    // data contains substring "GET /?data=<some content> HTTP/1.1"
+    // extract the <some content> into a string
+    string input(data.begin(), data.end());
+    size_t dataPos = input.find("data=");
+    size_t endPos = input.find(" HTTP", dataPos);
+
+    if (dataPos == string::npos || endPos == string::npos)
+    {
+        cout << "Invalid input format" << endl;
     }
     else
     {
-        cout << "Received " << bytesReceived << " bytes" << endl;
-        vector<char> data(buffer, buffer + bytesReceived);
-        callback(data);
+        string contents = input.substr(dataPos + 5, endPos - dataPos - 5);
+        callback(contents);
     }
+
+    // Send a success empty HTTP response
+    const char *response = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
+    send(clientSock, response, strlen(response), 0);
     closesocket(clientSock);
 }
 
 void LocalServer::acceptConnections()
 {
-    while (true)
+    while (running)
     {
         SOCKET clientSock = accept(sock, NULL, NULL);
         if (clientSock == INVALID_SOCKET)
         {
-            cout << "Accept failed" << endl;
-            cout << "Error: " << WSAGetLastError() << endl;
+            if (running) // Check if still running to avoid printing errors during shutdown
+            {
+                cout << "Accept failed" << endl;
+                cout << "Error: " << WSAGetLastError() << endl;
+            }
             continue;
         }
         cout << "Client connected" << endl;
@@ -149,15 +181,20 @@ bool LocalServer::init()
     if (!startListening())
         return false;
 
-    acceptConnections();
+    running = true;
+    connectionThread = thread(&LocalServer::acceptConnections, this);
     return true;
+}
+
+void LocalServer::forever()
+{
+    if (connectionThread.joinable())
+    {
+        connectionThread.join();
+    }
 }
 
 LocalServer::~LocalServer()
 {
-    if (sock != INVALID_SOCKET)
-    {
-        closesocket(sock);
-        WSACleanup();
-    }
+    WSACleanup();
 }

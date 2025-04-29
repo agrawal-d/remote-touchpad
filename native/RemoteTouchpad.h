@@ -1,12 +1,17 @@
 #pragma once
 #include <vector>
 #include <winsock2.h>
-#include <functional>
+#include <windows.h>
+#include <iostream>
 #include <cstdint>
+#include <sstream>
+#include <functional>
 #include <memory>
-#include <string>
 
+#include "Logger.h"
 #include "LocalServer.h"
+
+using namespace std;
 
 enum class ClickType
 {
@@ -24,14 +29,15 @@ private:
     float cursorXFraction;
     float cursorYFraction;
     ClickType clickType;
-    std::unique_ptr<LocalServer> server;
+    unique_ptr<LocalServer> server;
 
-    std::vector<std::string> split(const std::string &str, char delimiter);
+    vector<string> split(const string &str, char delimiter);
     bool getScreenSize();
-    bool handleInput(std::vector<char> data);
+    bool handleInput(string data);
 
 public:
     RemoteTouchPad(uint16_t port);
     bool init();
+    void forever();
     static void simulateMouseMovement(float cursorXFraction, float cursorYFraction, int screenWidth, int screenHeight, ClickType clickType);
 };

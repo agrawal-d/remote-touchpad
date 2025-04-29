@@ -1,21 +1,10 @@
-#include <vector>
-#include <winsock2.h>
-#include <windows.h>
-#include <iostream>
-#include <cstdint>
-#include <sstream>
-#include <functional>
-#include <memory>
-
 #include "RemoteTouchPad.h"
-#include "Logger.h"
-#include "LocalServer.h"
 
 using namespace std;
 
 RemoteTouchPad::RemoteTouchPad(uint16_t port)
 {
-    server = make_unique<LocalServer>(port, [this](vector<char> data)
+    server = make_unique<LocalServer>(port, [this](string data)
                                       { handleInput(data); });
 }
 
@@ -65,11 +54,44 @@ bool RemoteTouchPad::getScreenSize()
     return true;
 }
 
-bool RemoteTouchPad::handleInput(vector<char> data)
+bool RemoteTouchPad::handleInput(string input)
 {
-    // Input is a string CSV of x,y,clickType (clickType is an int)
-    string input(data.begin(), data.end());
-    auto sections = split(input, ',');
+    // Find the "data" field in the HTTP POST request
+    size_t dataPos = input.find("data=");
+    if (dataPos == string::npos)
+    {
+        cout << "Invalid HTTP POST request: 'data' field not found" << endl;
+        return false;
+    }
+
+    // Extract the value of the "data" field
+    size_t dataStart = dataPos + 5; // Skip "data="
+    size_t dataEnd = input.find('&', dataStart);
+    string csvData = input.substr(dataStart, dataEnd - dataStart);
+
+    cout << csvData << endl;
+    // Decode URL-encoded characters in the CSV data
+    string decodedCsvData;
+    for (size_t i = 0; i < csvData.length(); ++i)
+    {
+        if (csvData[i] == '%' && i + 2 < csvData.length())
+        {
+            string hexValue = csvData.substr(i + 1, 2);
+            decodedCsvData += static_cast<char>(stoi(hexValue, nullptr, 16));
+            i += 2;
+        }
+        else if (csvData[i] == '+')
+        {
+            decodedCsvData += ' ';
+        }
+        else
+        {
+            decodedCsvData += csvData[i];
+        }
+    }
+
+    // Split the decoded CSV data
+    auto sections = split(decodedCsvData, ',');
 
     if (sections.size() != 3)
     {
@@ -129,4 +151,9 @@ void RemoteTouchPad::simulateMouseMovement(float cursorXFraction, float cursorYF
     default:
         break;
     }
+}
+
+void RemoteTouchPad::forever()
+{
+    server->forever();
 }

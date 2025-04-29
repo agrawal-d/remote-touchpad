@@ -21,5 +21,7 @@ int main()
         return 1;
     }
 
+    touchPad.forever();
+
     return 0;
 }
