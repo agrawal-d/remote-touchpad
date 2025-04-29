@@ -19,6 +19,9 @@ private:
     SOCKET sock;
     thread connectionThread;
     atomic<bool> running;
+    static const string DATA_KEY;
+    static const string HTTP_KEY;
+    static const string HTTP_RESPONSE;
 
     bool initializeWinsock();
     bool createSocket();

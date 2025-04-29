@@ -1,5 +1,9 @@
 #include "LocalServer.h"
 
+const string LocalServer::DATA_KEY = "data=";
+const string LocalServer::HTTP_KEY = " HTTP";
+const string LocalServer::HTTP_RESPONSE = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
+
 LocalServer::LocalServer(uint16_t port, function<void(string)> callback)
     : port(port), callback(callback), sock(INVALID_SOCKET)
 {
@@ -99,7 +103,7 @@ bool LocalServer::startListening()
 void LocalServer::handleClient(SOCKET clientSock)
 {
     char buffer[4096]; // 4KiB buffer
-    string data;
+    string input;
 
     while (true)
     {
@@ -117,7 +121,7 @@ void LocalServer::handleClient(SOCKET clientSock)
         }
         else
         {
-            data.insert(data.end(), buffer, buffer + bytesReceived);
+            input.insert(input.end(), buffer, buffer + bytesReceived);
             if (bytesReceived >= 4 && buffer[bytesReceived - 4] == '\r' && buffer[bytesReceived - 3] == '\n' &&
                 buffer[bytesReceived - 2] == '\r' && buffer[bytesReceived - 1] == '\n')
             {
@@ -128,9 +132,11 @@ void LocalServer::handleClient(SOCKET clientSock)
 
     // data contains substring "GET /?data=<some content> HTTP/1.1"
     // extract the <some content> into a string
-    string input(data.begin(), data.end());
-    size_t dataPos = input.find("data=");
-    size_t endPos = input.find(" HTTP", dataPos);
+    const string DATA_KEY = "data=";
+    const string HTTP_KEY = " HTTP";
+
+    size_t dataPos = input.find(DATA_KEY);
+    size_t endPos = input.find(HTTP_KEY, dataPos);
 
     if (dataPos == string::npos || endPos == string::npos)
     {

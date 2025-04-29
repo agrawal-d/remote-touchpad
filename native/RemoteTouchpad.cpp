@@ -54,23 +54,8 @@ bool RemoteTouchPad::getScreenSize()
     return true;
 }
 
-bool RemoteTouchPad::handleInput(string input)
+bool RemoteTouchPad::handleInput(string csvData)
 {
-    // Find the "data" field in the HTTP POST request
-    size_t dataPos = input.find("data=");
-    if (dataPos == string::npos)
-    {
-        cout << "Invalid HTTP POST request: 'data' field not found" << endl;
-        return false;
-    }
-
-    // Extract the value of the "data" field
-    size_t dataStart = dataPos + 5; // Skip "data="
-    size_t dataEnd = input.find('&', dataStart);
-    string csvData = input.substr(dataStart, dataEnd - dataStart);
-
-    cout << csvData << endl;
-    // Decode URL-encoded characters in the CSV data
     string decodedCsvData;
     for (size_t i = 0; i < csvData.length(); ++i)
     {
@@ -101,8 +86,8 @@ bool RemoteTouchPad::handleInput(string input)
 
     try
     {
-        cursorXFraction = stof(sections[0]);
-        cursorYFraction = stof(sections[1]);
+        cursorXFraction = min(1.0f, abs(stof(sections[0])));
+        cursorYFraction = min(1.0f, abs(stof(sections[1])));
         int clickTypeInt = stoi(sections[2]);
 
         if (clickTypeInt < 0 || clickTypeInt > 3)
@@ -113,7 +98,7 @@ bool RemoteTouchPad::handleInput(string input)
 
         clickType = static_cast<ClickType>(clickTypeInt);
 
-        LOG_VERBOSE &&cout << "Cursor Position: (" << cursorXFraction << ", " << cursorYFraction << ")" << endl;
+        LOG_VERBOSE &&cout << "Cursor Fractions: (" << cursorXFraction << ", " << cursorYFraction << ")" << endl;
         LOG_VERBOSE &&cout << "Click Type: " << clickTypeInt << endl;
 
         simulateMouseMovement(cursorXFraction, cursorYFraction, screenWidth, screenHeight, clickType);
