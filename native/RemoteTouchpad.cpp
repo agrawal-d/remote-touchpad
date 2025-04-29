@@ -1,4 +1,7 @@
 #include "RemoteTouchPad.h"
+#include <winsock2.h>
+#include <iphlpapi.h>
+#include <ws2tcpip.h>
 
 using namespace std;
 
@@ -86,8 +89,8 @@ bool RemoteTouchPad::handleInput(string csvData)
 
     try
     {
-        cursorXFraction = min(1.0f, abs(stof(sections[0])));
-        cursorYFraction = min(1.0f, abs(stof(sections[1])));
+        cursorXFraction = max(-1.0f, min(1.0f, stof(sections[0])));
+        cursorYFraction = max(-1.0f, min(1.0f, stof(sections[1])));
         int clickTypeInt = stoi(sections[2]);
 
         if (clickTypeInt < 0 || clickTypeInt > 3)
@@ -115,8 +118,24 @@ bool RemoteTouchPad::handleInput(string csvData)
 void RemoteTouchPad::simulateMouseMovement(float cursorXFraction, float cursorYFraction, int screenWidth, int screenHeight, ClickType clickType)
 {
     // Calculate x and y
-    int x = static_cast<int>(cursorXFraction * screenWidth);
-    int y = static_cast<int>(cursorYFraction * screenHeight);
+    int delta_x = static_cast<int>(cursorXFraction * screenWidth);
+    int delta_y = static_cast<int>(cursorYFraction * screenHeight);
+
+    // Get current mouse position
+    POINT p;
+    if (!GetCursorPos(&p))
+    {
+        cout << "Failed to get current mouse position" << endl;
+        return;
+    }
+
+    // Calculate new mouse position
+    int x = p.x + delta_x;
+    int y = p.y + delta_y;
+
+    // Ensure the new position is within screen bounds
+    x = max(0, min(x, screenWidth - 1));
+    y = max(0, min(y, screenHeight - 1));
 
     // Set mouse position
     SetCursorPos(x, y);

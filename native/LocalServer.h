@@ -22,6 +22,7 @@ private:
     static const string DATA_KEY;
     static const string HTTP_KEY;
     static const string HTTP_RESPONSE;
+    static const string TEST_CONNECTION;
 
     bool initializeWinsock();
     bool createSocket();
