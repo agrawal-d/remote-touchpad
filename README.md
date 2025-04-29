@@ -5,11 +5,16 @@ Supports left click and right click.
 
 ## How to use?
 
-1. [Download the Windows app](https://github.com/agrawal-d/remote-touchpad/releases/latest) from "Releases" section on GitHub.
-1. Run the windows app you downloaded `touchpad.exe` and allow network access in any prompt if asked.
-1. Note the IP Address and port shown ( see screenshot for example ).
+1. [Download the Windows app](https://github.com/agrawal-d/remote-touchpad/releases/latest) from "Releases" section on GitHub (`touchpad.exe`).
+1. Run the windows app you downloaded and allow network access in any prompt if asked.
 
    ![Windows Screenshot](app-snip.png)
+
+1. If SmartScreen blocks the app, click on "More info" and then click "Run anyway".
+
+   ![SmartScreen Screenshot](smart-screen.png)
+
+1. Note the IP Address and port shown ( see screenshot for example ).
 
 1. Open the [website](https://agrawal-d.github.io/remote-touchpad) on your phone.
    Enter the IP address and port.
