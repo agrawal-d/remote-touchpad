@@ -16,7 +16,7 @@ Supports left click and right click.
 
 1. Note the IP Address and port shown ( see screenshot for example ).
 
-1. Open the [website](https://agrawal-d.github.io/remote-touchpad) on your phone.
+1. Open the [website](http://agrawal-d.github.io/remote-touchpad) on your phone.
    Enter the IP address and port.
 
    ![Website Screenshot](web-snip.png)
