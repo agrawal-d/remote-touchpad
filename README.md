@@ -1,6 +1,6 @@
 # Remote Touchpad
 
-A Windows application that allows you to use your mouse as a touchpad.
+A Windows application that allows you to use your smartphone as a touchpad.
 Supports left click and right click.
 
 ## How to use?
@@ -26,7 +26,7 @@ Supports left click and right click.
 ## License
 
 ```
-Remote Touchpad - A Windows application that allows you to use your mouse as a touchpad.
+Remote Touchpad - A Windows application that allows you to use your smartphone as a touchpad.
 Copyright (C) 2025 Divyanshu Agrawal <agrawal-d at outlook dot com>
 
 This program is free software: you can redistribute it and/or modify
